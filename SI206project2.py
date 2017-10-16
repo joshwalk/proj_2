@@ -1,7 +1,7 @@
 ## SI 206 W17 - Project 2
 
 ## COMMENT HERE WITH:
-## Your name:
+## Your name: Joshua Walker
 ## Anyone you worked with on this project:
 
 ## Below we have provided import statements, comments to separate out the
@@ -26,7 +26,6 @@ from bs4 import BeautifulSoup
 ## find_urls("I love looking at websites like http://etsy.com and http://instagram.com and stuff") should return ["http://etsy.com","http://instagram.com"]
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
-# http[s]*://.+?[.]*..+?\s
 def find_urls(s):
     return re.findall('(http[s]*://\S+?[\.]+..+?)\s', s)
 
@@ -64,15 +63,39 @@ def grab_headlines():
 ## requests.get(base_url, headers={'User-Agent': 'SI_CLASS'})
 
 def get_umsi_data():
-    pass
-    #Your code here
+    url = 'https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All'
+
+    count = 0
+    name_list = []
+    title_list = []
+    while count <= 12:
+        r = requests.get(url, headers={'User-Agent': 'SI_CLASS'})
+        soup = BeautifulSoup(r.text, "lxml")
+
+        name_div = soup.find_all("div", {"property" : "dc:title"})
+        for names in name_div:
+            name_list.append(names.h2.text)
+
+        title_div = soup.find_all("div", {"class" : "field-name-field-person-titles"})
+        for titles in title_div:
+            title_list.append(titles.div.div.text)
+
+        count += 1
+        url = "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page=" + str(count)
+
+    umsi_titles = dict(zip(name_list,title_list))
+    return umsi_titles
 
 ## PART 3 (b) Define a function called num_students.
 ## INPUT: The dictionary from get_umsi_data().
 ## OUTPUT: Return number of PhD students in the data.  (Don't forget, I may change the input data)
 def num_students(data):
-    pass
-    #Your code here
+    phd_count = 0
+    for value in data.values():
+        if value == "PhD student":
+            phd_count += 1
+
+    return phd_count
 
 
 
