@@ -1,4 +1,4 @@
-## SI 206 W17 - Project 2
+## SI 206 F17 - Project 2
 
 ## COMMENT HERE WITH:
 ## Your name: Joshua Walker
@@ -27,7 +27,8 @@ from bs4 import BeautifulSoup
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
 def find_urls(s):
-    return re.findall('(http[s]*://\S+?[\.]+..+?)\s', s)
+    # looks for http:// or https://, then any non-space character, then a ".", making sure ea "." is followed by at least 2 chars, and end is separated by a space
+    return re.findall('(http[s]*://\S+?[\.]+..+?)\s', s) # findall returns results as a list
 
 ## PART 2  - Define a function grab_headlines.
 ## INPUT: N/A. No input.
@@ -35,6 +36,7 @@ def find_urls(s):
 ## http://www.michigandaily.com/section/opinion
 
 def grab_headlines():
+    # uses BeautifulSoup to process data from Michigan Daily website
     base_url = 'http://www.michigandaily.com'
     r = requests.get(base_url)
     soup = BeautifulSoup(r.text, "lxml")
@@ -64,9 +66,10 @@ def get_umsi_data():
     url = 'https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All'
 
     count = 0
-    name_list = []
-    title_list = []
+    name_list = [] # list for all names
+    title_list = [] # list for all titles
     while count <= 12:
+        # uses BeautifulSoup to process data from UMSI directory website
         r = requests.get(url, headers={'User-Agent': 'SI_CLASS'})
         soup = BeautifulSoup(r.text, "lxml")
 
@@ -78,9 +81,9 @@ def get_umsi_data():
         # finds div w/ specific class and gets title text from a nest of tags (found in a div -> div -> div)
         title_div = soup.find_all("div", {"class" : "field-name-field-person-titles"})
         for titles in title_div:
-            title_list.append(titles.div.div.text)
+            title_list.append(titles.div.div.text) # adds each instance to title list
 
-        # assigns new url: while loop increments it by 1 until 12
+        # moves to next page; assigns new url: while loop increments it by 1 until 12
         count += 1
         url = "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page=" + str(count)
 
